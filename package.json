@@ -1,5 +1,5 @@
 {
-    "name": "keycloakify-starter",
+    "name": "keycloakify-starter-1",
     "version": "10.0.5",
     "description": "Starter for Keycloakify 10",
     "repository": {
@@ -17,12 +17,16 @@
     "license": "MIT",
     "keywords": [],
     "dependencies": {
+        "@emotion/react": "^11.13.3",
+        "@emotion/styled": "^11.13.0",
+        "@mui/icons-material": "^6.0.2",
+        "@mui/material": "^6.0.2",
         "keycloakify": "^10.0.5",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "tss-react": "^4.9.13"
     },
     "devDependencies": {
-        "storybook": "^8.1.10",
         "@storybook/react": "^8.1.10",
         "@storybook/react-vite": "^8.1.10",
         "@types/react": "^18.2.43",
@@ -35,6 +39,7 @@
         "eslint-plugin-react-refresh": "^0.4.5",
         "eslint-plugin-storybook": "^0.8.0",
         "prettier": "3.3.1",
+        "storybook": "^8.1.10",
         "typescript": "^5.2.2",
         "vite": "^5.0.8"
     }
