@@ -13,21 +13,23 @@ import { tss } from "tss-react/mui";
 import { CssBaseline } from "@mui/material";
 
 const Login = lazy(() => import("./pages/Login"));
+const LoginUpdatePassword = lazy(() => import("./pages/LoginUpdatePassword"));
+
 const doMakeUserConfirmPassword = true;
 const theme = createTheme({
     palette: {
         mode: "dark",
         background: {
             default: "#000000",
-            paper: "#111111",
+            paper: "#111111"
         },
         text: {
             primary: "rgb(54, 54, 54)",
-            secondary: "#A1A1A1",
+            secondary: "#A1A1A1"
         },
         primary: {
-            main: "#FFA500",
-        },
+            main: "#FFA500"
+        }
     },
     components: {
         MuiButton: {
@@ -41,67 +43,68 @@ const theme = createTheme({
 
                     "&.Mui-disabled": {
                         color: "rgba(255, 255, 255, 0.3)", // Greyed-out text for disabled state
-                        backgroundColor: "rgba(2, 84, 109, .54)", // Grey background for disabled button
-                    },
-                  }
+                        backgroundColor: "rgba(2, 84, 109, .54)" // Grey background for disabled button
+                    }
+                }
             },
             variants: [
                 {
-                  props: { disabled: false },
-                  style: {
-                    // Styles for the non-disabled state
-                    backgroundColor: "rgb(98, 191, 192)",
-                    color: "#fff",
-                    "&:hover": {
-                      backgroundColor: "#309698",
-                    },
-                  },
-                },
-              ],
+                    props: { disabled: false },
+                    style: {
+                        // Styles for the non-disabled state
+                        backgroundColor: "rgb(98, 191, 192)",
+                        color: "#fff",
+                        "&:hover": {
+                            backgroundColor: "#309698"
+                        }
+                    }
+                }
+            ]
         },
-        MuiOutlinedInput: { // This is the right component for TextField with "outlined" variant
+        MuiOutlinedInput: {
+            // This is the right component for TextField with "outlined" variant
             styleOverrides: {
                 root: {
                     "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "rgb(186, 186, 186)", // Default border color
+                        borderColor: "rgb(186, 186, 186)" // Default border color
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#62bfc0", // Teal color when hovered
+                        borderColor: "#62bfc0" // Teal color when hovered
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#62bfc0", // Teal color when focused
-                    },
+                        borderColor: "#62bfc0" // Teal color when focused
+                    }
                 },
                 input: {
                     // Apply styles for autofill state
-                    '&:-webkit-autofill': {
-                      WebkitBoxShadow: '0 0 0 100px #FFFFE0 inset',
-                      WebkitTextFillColor: '#000', // Black text for contrast
-                      caretColor: '#000', // Black caret for visibility
-                      backgroundColor: '#FFFFE0', // Light yellow background
-                    },
+                    "&:-webkit-autofill": {
+                        WebkitBoxShadow: "0 0 0 100px #FFFFE0 inset",
+                        WebkitTextFillColor: "#000", // Black text for contrast
+                        caretColor: "#000", // Black caret for visibility
+                        backgroundColor: "#FFFFE0" // Light yellow background
+                    }
                 }
-            },
+            }
         },
         MuiInputLabel: {
             styleOverrides: {
                 root: {
                     color: "rgb(186, 186, 186)", // Default label color
                     "&.Mui-focused": {
-                        color: "#62bfc0", // Teal color when focused
-                    },
-                },
-            },
+                        color: "#62bfc0" // Teal color when focused
+                    }
+                }
+            }
         },
         MuiIconButton: {
             styleOverrides: {
-              root: {
-                color: 'rgba(0, 0, 0, 0.54)',
-              },
-            },
-        },
+                root: {
+                    color: "rgba(0, 0, 0, 0.54)"
+                }
+            }
+        }
     }
-}); 
+});
 
 export default function KcPage(props: { kcContext: KcContext }) {
     return (
@@ -116,15 +119,23 @@ function KcPageContextualized(props: { kcContext: KcContext }) {
     const { kcContext } = props;
 
     const { i18n } = useI18n({ kcContext });
-    const {classes} = useStyles();
+    const { classes } = useStyles();
 
     return (
         <Suspense>
             {(() => {
                 switch (kcContext.pageId) {
-                    case "login.ftl": 
+                    case "login.ftl":
                         return (
                             <Login
+                                {...{ kcContext, i18n, classes }}
+                                Template={Template}
+                                doUseDefaultCss={true}
+                            />
+                        );
+                    case "login-update-password.ftl":
+                        return (
+                            <LoginUpdatePassword
                                 {...{ kcContext, i18n, classes }}
                                 Template={Template}
                                 doUseDefaultCss={true}
@@ -148,17 +159,21 @@ function KcPageContextualized(props: { kcContext: KcContext }) {
     );
 }
 
-const useStyles = tss.create(({ theme }) => ({
-    kcHtmlClass: {
-        ":root": {
-            colorScheme: "dark"
-        },
-    },
-    kcBodyClass: {
-        background: `url(${backgroundUrl}) no-repeat center center fixed`,
-        color: theme.palette.text.primary,
-    },
-} satisfies { [key in ClassKey]?: unknown }));
+const useStyles = tss.create(
+    ({ theme }) =>
+        ({
+            kcHtmlClass: {
+                ":root": {
+                    colorScheme: "dark"
+                }
+            },
+            kcBodyClass: {
+                background: `url(${backgroundUrl}) no-repeat center center fixed`,
+                backgroundSize: "cover",
+                color: theme.palette.text.primary
+            }
+        }) satisfies { [key in ClassKey]?: unknown }
+);
 
 // const classes = {
 //     kcHtmlClass: "",

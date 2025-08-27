@@ -1,6 +1,6 @@
 {
     "name": "keycloakify-starter-1",
-    "version": "10.0.5",
+    "version": "10.1.0",
     "description": "Starter for Keycloakify 10",
     "repository": {
         "type": "git",
@@ -21,7 +21,7 @@
         "@emotion/styled": "^11.13.0",
         "@mui/icons-material": "^6.0.2",
         "@mui/material": "^6.0.2",
-        "keycloakify": "^10.0.5",
+        "keycloakify": "11.9.4",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "tss-react": "^4.9.13"

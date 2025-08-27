@@ -20,7 +20,7 @@ export default function Login(props: PageProps<Extract<KcContext, { pageId: "log
     const { social, realm, url, usernameHidden, login, auth, registrationDisabled, messagesPerField } = kcContext;
 
     const { msg } = i18n;
-    const [username, setUsername] = useState("");
+    const [username, setUsername] = useState(login.username ?? "");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -66,7 +66,7 @@ export default function Login(props: PageProps<Extract<KcContext, { pageId: "log
             }
             socialProvidersNode={
                 <>
-                    {realm.password && social.providers !== undefined && social.providers.length !== 0 && (
+                    {realm.password && social && social.providers !== undefined && social.providers.length !== 0 && (
                         <div id="kc-social-providers" className={kcClsx("kcFormSocialAccountSectionClass")}>
                             <hr />
                             <h2>{msg("identity-provider-login-label")}</h2>
@@ -134,18 +134,6 @@ export default function Login(props: PageProps<Extract<KcContext, { pageId: "log
                                         onChange={(event) => setUsername(event.target.value)}
                                         aria-invalid={messagesPerField.existsError("username", "password")}
                                     />
-                                    {/* <input
-                                        tabIndex={2}
-                                        id="username"
-                                        className={kcClsx("kcInputClass")}
-                                        name="username"
-                                        defaultValue={login.username ?? ""}
-                                        onChange={(event) => setUsername(event.target.value)}
-                                        type="text"
-                                        autoFocus
-                                        autoComplete="username"
-                                        aria-invalid={messagesPerField.existsError("username", "password")}
-                                    /> */}
                                     {messagesPerField.existsError("username", "password") && (
                                         <span
                                             id="input-error"
@@ -160,22 +148,7 @@ export default function Login(props: PageProps<Extract<KcContext, { pageId: "log
                             )}
 
                             <div className={kcClsx("kcFormGroupClass")}>
-                                {/* <label htmlFor="password" className={kcClsx("kcLabelClass")}>
-                                    {msg("password")}
-                                </label>
-                                <PasswordWrapper kcClsx={kcClsx} i18n={i18n} passwordInputId="password">
-                                    <input
-                                        onChange={(event) => setPassword(event.target.value)}
-                                        tabIndex={3}
-                                        id="password"
-                                        className={kcClsx("kcInputClass")}
-                                        name="password"
-                                        type="password"
-                                        autoComplete="current-password"
-                                        aria-invalid={messagesPerField.existsError("username", "password")}
-                                    />
-                                </PasswordWrapper> */}
-                                <FormControl sx={{ width: '350px' }} variant="outlined">
+                                <FormControl sx={{ width: '100%' }} variant="outlined">
                                     <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
                                     <OutlinedInput
                                         aria-invalid={messagesPerField.existsError("username", "password")}

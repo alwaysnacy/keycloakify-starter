@@ -3,19 +3,20 @@ import { assert } from "keycloakify/tools/assert";
 import { clsx } from "keycloakify/tools/clsx";
 import type { TemplateProps } from "keycloakify/login/TemplateProps";
 import { getKcClsx } from "keycloakify/login/lib/kcClsx";
-import { useInsertScriptTags } from "keycloakify/tools/useInsertScriptTags";
-import { useInsertLinkTags } from "keycloakify/tools/useInsertLinkTags";
 import { useSetClassName } from "keycloakify/tools/useSetClassName";
+import { useInitialize } from "keycloakify/login/Template.useInitialize";
 import type { I18n } from "./i18n";
 import type { KcContext } from "./KcContext";
 import { useStyles } from "tss-react/mui";
 
 export default function Template(props: TemplateProps<KcContext, I18n>) {
     const {
+        displayInfo = false,
         displayMessage = true,
         displayRequiredFields = false,
         headerNode,
         socialProvidersNode = null,
+        infoNode = null,
         documentTitle,
         bodyClassName,
         kcContext,
@@ -27,9 +28,9 @@ export default function Template(props: TemplateProps<KcContext, I18n>) {
 
     const { kcClsx } = getKcClsx({ doUseDefaultCss, classes });
 
-    const { msg, msgStr} = i18n;
+    const { msg, msgStr, currentLanguage, enabledLanguages } = i18n;
 
-    const { locale, auth, url, message, isAppInitiatedAction, authenticationSession, scripts } = kcContext;
+    const { realm, locale, auth, url, message, isAppInitiatedAction } = kcContext;
 
     useEffect(() => {
         document.title = documentTitle ?? msgStr("loginTitle", kcContext.realm.displayName);
@@ -45,73 +46,10 @@ export default function Template(props: TemplateProps<KcContext, I18n>) {
         className: bodyClassName ?? kcClsx("kcBodyClass")
     });
 
-    useEffect(() => {
-        const { currentLanguageTag } = locale ?? {};
+    const { isReadyToRender } = useInitialize({ kcContext, doUseDefaultCss });
+    const { css, theme, cx } = useStyles();
 
-        if (currentLanguageTag === undefined) {
-            return;
-        }
-
-        const html = document.querySelector("html");
-        assert(html !== null);
-        html.lang = currentLanguageTag;
-    }, []);
-
-    const { areAllStyleSheetsLoaded } = useInsertLinkTags({
-        componentOrHookName: "Template",
-        hrefs: !doUseDefaultCss
-            ? []
-            : [
-                  `${url.resourcesCommonPath}/node_modules/@patternfly/patternfly/patternfly.min.css`,
-                  `${url.resourcesCommonPath}/node_modules/patternfly/dist/css/patternfly.min.css`,
-                  `${url.resourcesCommonPath}/node_modules/patternfly/dist/css/patternfly-additions.min.css`,
-                  `${url.resourcesCommonPath}/lib/pficon/pficon.css`,
-                  `${url.resourcesPath}/css/login.css`
-              ]
-    });
-
-    const { insertScriptTags } = useInsertScriptTags({
-        componentOrHookName: "Template",
-        scriptTags: [
-            {
-                type: "module",
-                src: `${url.resourcesPath}/js/menu-button-links.js`
-            },
-            ...(authenticationSession === undefined
-                ? []
-                : [
-                      {
-                          type: "module",
-                          textContent: [
-                              `import { checkCookiesAndSetTimer } from "${url.resourcesPath}/js/authChecker.js";`,
-                              ``,
-                              `checkCookiesAndSetTimer(`,
-                              `  "${authenticationSession.authSessionId}",`,
-                              `  "${authenticationSession.tabId}",`,
-                              `  "${url.ssoLoginInOtherTabsUrl}"`,
-                              `);`
-                          ].join("\n")
-                      } as const
-                  ]),
-            ...scripts.map(
-                script =>
-                    ({
-                        type: "text/javascript",
-                        src: script
-                    }) as const
-            )
-        ]
-    });
-
-    useEffect(() => {
-        if (areAllStyleSheetsLoaded) {
-            insertScriptTags();
-        }
-    }, [areAllStyleSheetsLoaded]);
-
-    const {css, theme, cx} = useStyles();
-
-    if (!areAllStyleSheetsLoaded) {
+    if (!isReadyToRender) {
         return null;
     }
 
@@ -134,13 +72,48 @@ export default function Template(props: TemplateProps<KcContext, I18n>) {
                 css({
                     borderTop: "none",
                     borderRadius: theme.shape.borderRadius,
+                    width: "100%",
                 })
             )
             }>
                 <header className={kcClsx("kcFormHeaderClass")}>
+                    {realm.internationalizationEnabled && (assert(locale !== undefined), locale.supported.length > 1) && (
+                        <div className={kcClsx("kcLocaleMainClass")} id="kc-locale">
+                            <div id="kc-locale-wrapper" className={kcClsx("kcLocaleWrapperClass")}>
+                                <div id="kc-locale-dropdown" className={clsx("menu-button-links", kcClsx("kcLocaleDropDownClass"))}>
+                                    <button
+                                        tabIndex={1}
+                                        id="kc-current-locale-link"
+                                        aria-label={msgStr("languages")}
+                                        aria-haspopup="true"
+                                        aria-expanded="false"
+                                        aria-controls="language-switch1"
+                                    >
+                                        {currentLanguage.label}
+                                    </button>
+                                    <ul
+                                        role="menu"
+                                        tabIndex={-1}
+                                        aria-labelledby="kc-current-locale-link"
+                                        aria-activedescendant=""
+                                        id="language-switch1"
+                                        className={kcClsx("kcLocaleListClass")}
+                                    >
+                                        {enabledLanguages.map(({ languageTag, label, href }, i) => (
+                                            <li key={languageTag} className={kcClsx("kcLocaleListItemClass")} role="none">
+                                                <a role="menuitem" id={`language-${i + 1}`} className={kcClsx("kcLocaleItemClass")} href={href}>
+                                                    {label}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     {(() => {
                         const node = !(auth !== undefined && auth.showUsername && !auth.showResetCredentials) ? (
-                            <h2 id="kc-page-title" className={css({fontSize: "1.5rem", lineHeight: "2rem", strong: {fontWeight: 500}})}>{headerNode}</h2>
+                            <h1 id="kc-page-title">{headerNode}</h1>
                         ) : (
                             <div id="kc-username" className={kcClsx("kcFormGroupClass")}>
                                 <label id="kc-attempted-username">{auth.attemptedUsername}</label>
@@ -214,13 +187,13 @@ export default function Template(props: TemplateProps<KcContext, I18n>) {
                             </form>
                         )}
                         {socialProvidersNode}
-                        {/* {displayInfo && (
+                        {displayInfo && (
                             <div id="kc-info" className={kcClsx("kcSignUpClass")}>
                                 <div id="kc-info-wrapper" className={kcClsx("kcInfoAreaWrapperClass")}>
                                     {infoNode}
                                 </div>
                             </div>
-                        )} */}
+                        )}
                     </div>
                 </div>
             </div>
